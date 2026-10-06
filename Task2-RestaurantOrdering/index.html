@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DineDesk - Restaurant Ordering & Reservations</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+
+    <!-- Header / Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-warning" href="#"><i class="fa-solid fa-utensils me-2"></i>DineDesk</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#menuSection">Menu</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#reservationSection">Table Reservation</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Banner -->
+    <div class="bg-warning text-dark py-4 text-center shadow-sm">
+        <div class="container">
+            <h1 class="fw-bold">Delicious Food, Delivered Fast</h1>
+            <p class="lead mb-0">Browse our digital menu, place your order, or reserve a table instantly.</p>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container py-4">
+        
+        <!-- Menu & Cart Section -->
+        <div class="row g-4 mb-5" id="menuSection">
+            <!-- Left Side: Digital Menu -->
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold text-secondary mb-0"><i class="fa-solid fa-book-open me-2"></i>Digital Menu</h4>
+                    <!-- Category Filter -->
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-dark btn-sm active" onclick="filterCategory('All', this)">All</button>
+                        <button type="button" class="btn btn-outline-dark btn-sm" onclick="filterCategory('Mains', this)">Mains</button>
+                        <button type="button" class="btn btn-outline-dark btn-sm" onclick="filterCategory('Drinks', this)">Drinks</button>
+                        <button type="button" class="btn btn-outline-dark btn-sm" onclick="filterCategory('Desserts', this)">Desserts</button>
+                    </div>
+                </div>
+
+                <div class="row g-3" id="menuGrid">
+                    <!-- Menu Items inserted dynamically -->
+                </div>
+            </div>
+
+            <!-- Right Side: Order Summary Cart -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                    <div class="card-header bg-dark text-white py-3">
+                        <h5 class="card-title mb-0 fw-bold"><i class="fa-solid fa-cart-shopping me-2"></i>Your Order</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="cartItemsList" class="mb-3">
+                            <p class="text-muted text-center py-3">Your cart is currently empty.</p>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
+                            <span>Total Amount:</span>
+                            <span class="text-success">$<span id="cartTotal">0.00</span></span>
+                        </div>
+                        <button class="btn btn-warning w-100 fw-bold py-2" onclick="checkoutOrder()"><i class="fa-solid fa-paper-plane me-2"></i>Place Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reservation Section -->
+        <div class="row" id="reservationSection">
+            <div class="col-md-8 mx-auto">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0 fw-bold text-dark"><i class="fa-solid fa-calendar-check me-2 text-warning"></i>Table Reservation</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="reservationForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small font-monospace text-muted">YOUR NAME</label>
+                                    <input type="text" class="form-control" id="resName" placeholder="John Doe" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small font-monospace text-muted">GUESTS</label>
+                                    <select class="form-select" id="resGuests">
+                                        <option value="1">1 Person</option>
+                                        <option value="2" selected>2 People</option>
+                                        <option value="4">4 People</option>
+                                        <option value="6">6+ People</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small font-monospace text-muted">DATE</label>
+                                    <input type="date" class="form-control" id="resDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small font-monospace text-muted">TIME</label>
+                                    <input type="time" class="form-control" id="resTime" required>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-dark w-100 fw-bold py-2"><i class="fa-solid fa-bookmark me-2 text-warning"></i>Confirm Reservation</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap & JS Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const menuItems = [
+            { id: 1, name: "Margherita Pizza", category: "Mains", price: 12.99, icon: "fa-pizza-slice" },
+            { id: 2, name: "Gourmet Burger", category: "Mains", price: 9.50, icon: "fa-burger" },
+            { id: 3, name: "Creamy Pasta", category: "Mains", price: 11.00, icon: "fa-bowl-food" },
+            { id: 4, name: "Iced Latte", category: "Drinks", price: 4.50, icon: "fa-mug-hot" },
+            { id: 5, name: "Fresh Mojito", category: "Drinks", price: 5.50, icon: "fa-glass-water" },
+            { id: 6, name: "Chocolate Cake", category: "Desserts", price: 6.00, icon: "fa-cake-candles" }
+        ];
+
+        let cart = [];
+
+        function renderMenu(category = 'All') {
+            const grid = document.getElementById('menuGrid');
+            grid.innerHTML = '';
+            
+            const filtered = category === 'All' ? menuItems : menuItems.filter(item => item.category === category);
+
+            filtered.forEach(item => {
+                grid.innerHTML += `
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light p-3 rounded-circle text-warning fs-3 me-3">
+                                    <i class="fa-solid ${item.icon}"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-1">${item.name}</h6>
+                                    <span class="badge bg-secondary mb-2">${item.category}</span>
+                                    <div class="fw-bold text-success">$${item.price.toFixed(2)}</div>
+                                </div>
+                                <button onclick="addToCart(${item.id})" class="btn btn-outline-warning btn-sm fw-bold">
+                                    <i class="fa-solid fa-plus me-1"></i>Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterCategory(cat, btn) {
+            document.querySelectorAll('.btn-group .btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderMenu(cat);
+        }
+
+        function addToCart(id) {
+            const item = menuItems.find(i => i.id === id);
+            const existing = cart.find(c => c.id === id);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+            updateCart();
+        }
+
+        function updateCart() {
+            const list = document.getElementById('cartItemsList');
+            const totalEl = document.getElementById('cartTotal');
+            
+            if (cart.length === 0) {
+                list.innerHTML = '<p class="text-muted text-center py-3">Your cart is currently empty.</p>';
+                totalEl.innerText = '0.00';
+                return;
+            }
+
+            let total = 0;
+            list.innerHTML = '';
+            
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.qty;
+                total += itemTotal;
+                list.innerHTML += `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <div class="fw-bold small">${item.name}</div>
+                            <div class="text-muted small">$${item.price.toFixed(2)} x ${item.qty}</div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="fw-bold me-2">$${itemTotal.toFixed(2)}</span>
+                            <button onclick="removeFromCart(${index})" class="btn btn-sm btn-link text-danger p-0"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            totalEl.innerText = total.toFixed(2);
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        function checkoutOrder() {
+            if (cart.length === 0) {
+                alert("Please add items to your cart first!");
+                return;
+            }
+            alert("Order placed successfully! Total: $" + document.getElementById('cartTotal').innerText);
+            cart = [];
+            updateCart();
+        }
+
+        document.getElementById('reservationForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('resName').value;
+            const guests = document.getElementById('resGuests').value;
+            const date = document.getElementById('resDate').value;
+            const time = document.getElementById('resTime').value;
+
+            alert(`Table Reserved Successfully for ${name} (${guests} Guests) on ${date} at ${time}.`);
+            e.target.reset();
+        });
+
+        // Initialize on page load
+        renderMenu();
+    </script>
+</body>
+</html>

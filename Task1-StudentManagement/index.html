@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduManage - Student Management System</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#"><i class="fa-solid fa-graduation-cap me-2"></i>EduManage</a>
+            <span class="navbar-text text-white">Student Management System</span>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container py-4">
+        <div class="row g-4">
+            
+            <!-- Left Form Side: Add/Edit Student -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0 text-primary fw-bold" id="formTitle">
+                            <i class="fa-solid fa-user-plus me-2"></i>Add New Student
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="studentForm">
+                            <input type="hidden" id="studentIndex" value="-1">
+                            
+                            <div class="mb-3">
+                                <label for="roll" class="form-label font-monospace small text-muted">ROLL / ID NUMBER</label>
+                                <input type="text" id="roll" class="form-control" placeholder="e.g. STU-101" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="name" class="form-label font-monospace small text-muted">FULL NAME</label>
+                                <input type="text" id="name" class="form-control" placeholder="e.g. John Doe" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label font-monospace small text-muted">EMAIL ADDRESS</label>
+                                <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="course" class="form-label font-monospace small text-muted">COURSE / ENROLLED IN</label>
+                                <input type="text" id="course" class="form-control" placeholder="e.g. Computer Science" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="status" class="form-label font-monospace small text-muted">STATUS</label>
+                                <select id="status" class="form-select">
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                    <option value="Pending">Pending Fee</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mt-2" id="submitBtn">
+                                <i class="fa-solid fa-check me-2"></i>Save Student
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary w-100 fw-bold py-2 mt-2 d-none" id="cancelBtn" onclick="resetForm()">
+                                Cancel Edit
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Table Side: Student Directory -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 fw-bold text-secondary">
+                            <i class="fa-solid fa-users me-2"></i>Student Records
+                        </h5>
+                        <input type="text" id="searchInput" class="form-control form-control-sm w-50" placeholder="Search by name, roll, or course..." onkeyup="filterStudents()">
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">Roll ID</th>
+                                        <th>Student</th>
+                                        <th>Course</th>
+                                        <th>Status</th>
+                                        <th class="text-end pe-3">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentTable">
+                                    <!-- Dynamic rows inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="noDataMessage" class="text-center py-4 text-muted d-none">
+                            <i class="fa-solid fa-folder-open fa-2x mb-2"></i>
+                            <p class="mb-0">No student records found.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript logic -->
+    <script>
+        // Sample default data if local storage is empty
+        const defaultStudents = [
+            { roll: "101", name: "Rishabh Jha", email: "rishabh@example.com", course: "Computer Science Engineering", status: "Active" },
+            { roll: "102", name: "Ananya Sharma", email: "ananya@example.com", course: "Information Technology", status: "Active" }
+        ];
+
+        let students = JSON.parse(localStorage.getItem('students')) || defaultStudents;
+
+        function renderStudents(dataToRender = students) {
+            const tbody = document.getElementById('studentTable');
+            const noData = document.getElementById('noDataMessage');
+            tbody.innerHTML = '';
+
+            if (dataToRender.length === 0) {
+                noData.classList.remove('d-none');
+                return;
+            } else {
+                noData.classList.add('d-none');
+            }
+
+            dataToRender.forEach((s, index) => {
+                let badgeClass = 'bg-success';
+                if (s.status === 'Inactive') badgeClass = 'bg-secondary';
+                if (s.status === 'Pending') badgeClass = 'bg-warning text-dark';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="ps-3 font-monospace fw-bold">${s.roll}</td>
+                        <td>
+                            <div class="fw-bold">${s.name}</div>
+                            <div class="small text-muted">${s.email}</div>
+                        </td>
+                        <td>${s.course}</td>
+                        <td><span class="badge ${badgeClass}">${s.status}</span></td>
+                        <td class="text-end pe-3">
+                            <button onclick="editStudent(${index})" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteStudent(${index})" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            localStorage.setItem('students', JSON.stringify(students));
+        }
+
+        document.getElementById('studentForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const index = parseInt(document.getElementById('studentIndex').value);
+            const roll = document.getElementById('roll').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const course = document.getElementById('course').value.trim();
+            const status = document.getElementById('status').value;
+
+            if (index === -1) {
+                students.push({ roll, name, email, course, status });
+            } else {
+                students[index] = { roll, name, email, course, status };
+            }
+
+            resetForm();
+            renderStudents();
+        });
+
+        function editStudent(index) {
+            const student = students[index];
+            document.getElementById('studentIndex').value = index;
+            document.getElementById('roll').value = student.roll;
+            document.getElementById('name').value = student.name;
+            document.getElementById('email').value = student.email;
+            document.getElementById('course').value = student.course;
+            document.getElementById('status').value = student.status;
+
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-user-pen me-2"></i>Edit Student`;
+            document.getElementById('submitBtn').innerHTML = `<i class="fa-solid fa-floppy-disk me-2"></i>Update Student`;
+            document.getElementById('cancelBtn').classList.remove('d-none');
+        }
+
+        function deleteStudent(index) {
+            if (confirm("Are you sure you want to delete this student record?")) {
+                students.splice(index, 1);
+                renderStudents();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('studentIndex').value = -1;
+            document.getElementById('studentForm').reset();
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-user-plus me-2"></i>Add New Student`;
+            document.getElementById('submitBtn').innerHTML = `<i class="fa-solid fa-check me-2"></i>Save Student`;
+            document.getElementById('cancelBtn').classList.add('d-none');
+        }
+
+        function filterStudents() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = students.filter(s => 
+                s.name.toLowerCase().includes(query) ||
+                s.roll.toLowerCase().includes(query) ||
+                s.course.toLowerCase().includes(query)
+            );
+            renderStudents(filtered);
+        }
+
+        // Initial render on load
+        renderStudents();
+    </script>
+</body>
+</html>

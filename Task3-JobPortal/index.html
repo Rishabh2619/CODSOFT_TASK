@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerHub - Recruitment & Job Portal</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+
+    <!-- Header / Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#"><i class="fa-solid fa-briefcase me-2"></i>CareerHub</a>
+            <span class="navbar-text text-white">Find Jobs & Recruit Top Talent</span>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container py-4">
+        
+        <!-- Search & Filter Bar -->
+        <div class="card border-0 shadow-sm p-3 mb-4">
+            <div class="row g-2">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Job title, keywords, or company..." onkeyup="filterJobs()">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select id="typeFilter" class="form-select" onchange="filterJobs()">
+                        <option value="All">All Job Types</option>
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Remote">Remote</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-outline-success w-100 fw-bold" data-bs-toggle="modal" data-bs-target="#postJobModal">
+                        <i class="fa-solid fa-plus me-1"></i>Post a Job
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Listings Row -->
+        <div class="row g-3" id="jobGrid">
+            <!-- Dynamic Job Cards will appear here -->
+        </div>
+
+    </div>
+
+    <!-- Modal: Post a Job -->
+    <div class="modal fade" id="postJobModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-success"><i class="fa-solid fa-building me-2"></i>Post a New Job</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="jobForm">
+                        <div class="mb-3">
+                            <label class="form-label small font-monospace text-muted">JOB TITLE</label>
+                            <input type="text" id="jobTitle" class="form-control" placeholder="e.g. Frontend Developer" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small font-monospace text-muted">COMPANY NAME</label>
+                            <input type="text" id="jobCompany" class="form-control" placeholder="e.g. TechCorp Solutions" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small font-monospace text-muted">LOCATION</label>
+                            <input type="text" id="jobLocation" class="form-control" placeholder="e.g. Remote / New York" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small font-monospace text-muted">JOB TYPE</label>
+                            <select id="jobType" class="form-select">
+                                <option value="Full-time">Full-time</option>
+                                <option value="Part-time">Part-time</option>
+                                <option value="Remote">Remote</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 fw-bold">Publish Job Opening</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Application Form -->
+    <div class="modal fade" id="applyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-success" id="applyModalTitle">Apply for Job</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="applyForm">
+                        <input type="hidden" id="selectedJobTitle">
+                        <div class="mb-3">
+                            <label class="form-label small font-monospace text-muted">FULL NAME</label>
+                            <input type="text" class="form-control" placeholder="Your Full Name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small font-monospace text-muted">EMAIL ADDRESS</label>
+                            <input type="email" class="form-control" placeholder="name@example.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small font-monospace text-muted">RESUME LINK / PORTFOLIO</label>
+                            <input type="url" class="form-control" placeholder="https://linkedin.com/in/username" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 fw-bold">Submit Application</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const initialJobs = [
+            { id: 1, title: "Frontend Developer (React)", company: "TechCorp Inc.", location: "Remote", type: "Remote", salary: "$70k - $90k" },
+            { id: 2, title: "Node.js Backend Engineer", company: "DevStudio LLC", location: "Hybrid", type: "Full-time", salary: "$80k - $100k" },
+            { id: 3, title: "UI/UX Designer", company: "Creative Minds", location: "On-site", type: "Part-time", salary: "$40k - $50k" },
+            { id: 4, title: "Full Stack Software Engineer", company: "InnovateX", location: "Remote", type: "Remote", salary: "$95k - $120k" }
+        ];
+
+        let jobs = JSON.parse(localStorage.getItem('jobs')) || initialJobs;
+
+        function renderJobs(filteredJobs = jobs) {
+            const grid = document.getElementById('jobGrid');
+            grid.innerHTML = '';
+
+            if (filteredJobs.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-12 text-center py-5 text-muted">
+                        <i class="fa-solid fa-briefcase fa-3x mb-3"></i>
+                        <h5>No job openings found matching your criteria.</h5>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredJobs.forEach(job => {
+                let typeBadge = 'bg-primary';
+                if (job.type === 'Remote') typeBadge = 'bg-success';
+                if (job.type === 'Part-time') typeBadge = 'bg-warning text-dark';
+
+                grid.innerHTML += `
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100 p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h5 class="fw-bold mb-1 text-dark">${job.title}</h5>
+                                    <p class="text-muted mb-0 small"><i class="fa-regular fa-building me-1"></i>${job.company} • <i class="fa-solid fa-location-dot me-1"></i>${job.location}</p>
+                                </div>
+                                <span class="badge ${typeBadge}">${job.type}</span>
+                            </div>
+                            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-success small">${job.salary || 'Competitive'}</span>
+                                <button onclick="openApplyModal('${job.title}')" class="btn btn-sm btn-success fw-bold">
+                                    Apply Now <i class="fa-solid fa-arrow-right ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            localStorage.setItem('jobs', JSON.stringify(jobs));
+        }
+
+        function filterJobs() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const type = document.getElementById('typeFilter').value;
+
+            const filtered = jobs.filter(j => {
+                const matchesQuery = j.title.toLowerCase().includes(query) || j.company.toLowerCase().includes(query) || j.location.toLowerCase().includes(query);
+                const matchesType = type === 'All' || j.type === type;
+                return matchesQuery && matchesType;
+            });
+
+            renderJobs(filtered);
+        }
+
+        document.getElementById('jobForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('jobTitle').value;
+            const company = document.getElementById('jobCompany').value;
+            const location = document.getElementById('jobLocation').value;
+            const type = document.getElementById('jobType').value;
+
+            jobs.unshift({ id: Date.now(), title, company, location, type, salary: "$75k - $95k" });
+            renderJobs();
+
+            // Close Modal
+            const modalEl = document.getElementById('postJobModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+            e.target.reset();
+        });
+
+        function openApplyModal(title) {
+            document.getElementById('selectedJobTitle').value = title;
+            document.getElementById('applyModalTitle').innerText = `Apply for: ${title}`;
+            const modal = new bootstrap.Modal(document.getElementById('applyModal'));
+            modal.show();
+        }
+
+        document.getElementById('applyForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('selectedJobTitle').value;
+            alert(`Application successfully submitted for ${title}!`);
+            const modalEl = document.getElementById('applyModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+            e.target.reset();
+        });
+
+        // Initialize on load
+        renderJobs();
+    </script>
+</body>
+</html>
